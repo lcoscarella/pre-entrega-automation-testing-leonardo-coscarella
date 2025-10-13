@@ -12,7 +12,7 @@
 ### - utils y vars
 
 ### Comando para ejecutar las pruebas (por ejemplo: pytest -v --html=reporte.html)
-### python -m pytest -v --html=reports/reportePreEntrega_V2.html --self-contained-html
+### python -m pytest -v --html=reports/reportePreEntrega_Vx.html --self-contained-html
 
 ### Detalle de funciones
 ### login(usuario, contraseña): 

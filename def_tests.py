@@ -5,9 +5,10 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.options import Options
-
+from tests import conftest
 import time
 from utils import vars
+
 
 ### python -m tests.def_tests
 ### python -m def_tests
@@ -19,6 +20,9 @@ def login(user,pwd):
 
     # Indico url
     driver.get(vars.sauceDemoUrl)
+
+    # Capturo url inicial
+    driver.save_screenshot("capturas/url_inicial.png")
 
     # Establezco pausa
     time.sleep(5)
@@ -38,7 +42,8 @@ def login(user,pwd):
     # Comprueba si la url a donde fuimos dirigidos es la de inventario
     if( driver.current_url != vars.landing_url_login_exitoso):
         return False
-    
+
+    driver.save_screenshot("capturas/url_post_login.png")
     return True
     
 
@@ -87,25 +92,27 @@ def comprobar_elementos_inventario(user,pwd):
     if(len(driver.find_elements(By.CLASS_NAME,"inventory_item_name ")) < 1):
         return False
 
+    driver.save_screenshot("capturas/condicionesInventarioPostLogin.png")
+
     ### Comprobar presencia de menu, filtros
     try:
         driver.find_element(By.CLASS_NAME,"bm-menu")
         ddlSort = Select(driver.find_element(By.CLASS_NAME,"product_sort_container"))
         ddlSort.select_by_value("za")
 
+        driver.save_screenshot("capturas/inventarioOrdenadoPorNombre.png")
+
         time.sleep(4)
 
         ddlSort = Select(driver.find_element(By.CLASS_NAME,"product_sort_container"))
         ddlSort.select_by_value("lohi")
 
+        driver.save_screenshot("capturas/inventarioOrdenadoPorPrecio.png")
+
         time.sleep(3)
         return True
     except:
         return False
-
-    
-
-
 
     return True
 
@@ -150,6 +157,8 @@ def agregar_productos(user,pwd):
     if(int(driver.find_element(By.CLASS_NAME,"shopping_cart_badge").text) < 1):
         return False
 
+    driver.save_screenshot("capturas/logoCarritoIncremento.png")
+
     # Dirijo a la url del carrito
     driver.get(vars.cart_url)
 
@@ -160,10 +169,11 @@ def agregar_productos(user,pwd):
     if(driver.find_element(By.CLASS_NAME,"inventory_item_name").text != "Sauce Labs Backpack"):
         return False
 
+    driver.save_screenshot("capturas/carritoConProductos.png")
     # Establezco pausa
     time.sleep(5)
 
     return True
 
-print("comprobar_elementos_inventario resultado: " + str(comprobar_elementos_inventario("standard_user","secret_sauce")))
+print("resultado: " + str(comprobar_elementos_inventario("standard_user","secret_sauce")))
 
