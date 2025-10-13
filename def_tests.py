@@ -3,6 +3,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+
 import time
 from utils import vars
 
@@ -10,60 +12,144 @@ from utils import vars
 ### python -m def_tests
 
 def login(user,pwd):
+    # Inicializo web driver
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service)
 
+    # Indico url
     driver.get(vars.sauceDemoUrl)
 
-    ###print("URL de Login: " + vars.sauceDemoUrl)
-
+    # Establezco pausa
     time.sleep(5)
-    blnLoginExitoso = True
-    
 
+    # Ingreso usuario, contraseña y click en boton
     box_user = driver.find_element(By.ID,"user-name")
     box_pwd =  driver.find_element(By.ID,"password")
-
     button_login = driver.find_element(By.ID,"login-button")
 
     box_user.send_keys(user)
     box_pwd.send_keys(pwd)
-
-    print("Enviado keys de user y pwd")
-
     button_login.click()
 
-    print("Enviado click a boton de Login")
-
+    # Establezco pausa
     time.sleep(7)
 
-    if( driver.current_url == vars.landing_url_login_exitoso):
-        blnLoginExitoso = True
-    else:
-        blnLoginExitoso = False
+    # Comprueba si la url a donde fuimos dirigidos es la de inventario
+    if( driver.current_url != vars.landing_url_login_exitoso):
+        return False
     
-    ### print("Resultado Login: " + str(blnLoginExitoso))
+    return True
+    
 
-    return blnLoginExitoso
+def comprobar_elementos_inventario(user,pwd):
+    # Inicializo web driver
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service)
 
-print("Login resultado: " + str(login("standard_user","secret_sauce")))
+    # Indico url
+    driver.get(vars.sauceDemoUrl)
 
-'''
-logo_selector = driver.find_element(By.CLASS_NAME,"app_logo")
-swag_text = logo_selector.text
+    # Establezco pausa
+    time.sleep(5)
 
-title_selector = driver.find_element(By.CLASS_NAME,"title")
-title_text = title_selector.text
+    # Ingreso usuario, contraseña y click en boton
+    box_user = driver.find_element(By.ID,"user-name")
+    box_pwd =  driver.find_element(By.ID,"password")
+    button_login = driver.find_element(By.ID,"login-button")
 
-products = driver.find_elements(By.CLASS_NAME,"inventory_item_name ")
-product_count = len(products)
+    box_user.send_keys(user)
+    box_pwd.send_keys(pwd)
+    button_login.click()
 
-print("Text:" + swag_text)
-print("Title:" + title_text)
-print("Cantidad de Productos mostrados: " + str(product_count))
+    # Establezco pausa
+    time.sleep(7)
 
-'''
+    # Comprueba si la url a donde fuimos dirigidos es la de inventario
+    if( driver.current_url != vars.landing_url_login_exitoso):
+        return False
+    
+    ### Comineza seccion Inventario
 
+    ### Comprobar que el titluo de inventory.html sea "Swag Labs"
+    if(driver.title != "Swag Labs"):
+        return False
 
-### python -m tests.login
+    ### Comprobar que existe el texto 'Swag Labs'
+    if(driver.find_element(By.CLASS_NAME,"app_logo").text.strip() != "Swag Labs"):
+        return False
+
+    ### Comprobar que existe el texto 'Products'
+    if(driver.find_element(By.CLASS_NAME,"title").text.strip() != "Products"):
+        return False
+
+    ### Comprobar que hay listados al menos 1 producto
+    if(len(driver.find_elements(By.CLASS_NAME,"inventory_item_name ")) < 1):
+        return False
+
+    ### Comprobar presencia de menu, filtros
+    try:
+        driver.find_element(By.CLASS_NAME,"bm-menu")
+        return True
+    except:
+        return False
+
+    return True
+
+def agregar_productos(user,pwd):
+    # Inicializo web driver
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service)
+
+    # Indico url
+    driver.get(vars.sauceDemoUrl)
+
+    # Establezco pausa
+    time.sleep(5)
+
+    # Ingreso usuario, contraseña y click en boton
+    box_user = driver.find_element(By.ID,"user-name")
+    box_pwd =  driver.find_element(By.ID,"password")
+    button_login = driver.find_element(By.ID,"login-button")
+
+    box_user.send_keys(user)
+    box_pwd.send_keys(pwd)
+    button_login.click()
+
+    # Establezco pausa
+    time.sleep(7)
+
+    # Comprueba si la url a donde fuimos dirigidos es la de inventario
+    if( driver.current_url != vars.landing_url_login_exitoso):
+        return False
+    
+    # Comprobar que hay listados al menos 1 producto
+    if(len(driver.find_elements(By.CLASS_NAME,"inventory_item_name ")) < 1):
+        return False
+    
+    # Hacer click en el primer producto encontrado
+    driver.find_element(By.ID,"add-to-cart-sauce-labs-backpack").click()
+
+    # Establerzco pausa
+    time.sleep(3)
+
+    # Comprobar que el contador de productos en el carrito sea igual o mayor a 1
+    if(int(driver.find_element(By.CLASS_NAME,"shopping_cart_badge").text) < 1):
+        return False
+
+    # Dirijo a la url del carrito
+    driver.get(vars.cart_url)
+
+    # Establezco pausa
+    time.sleep(5)
+
+    # Compruebo que el nombre del producto agregado sea correcto
+    if(driver.find_element(By.CLASS_NAME,"inventory_item_name").text != "Sauce Labs Backpack"):
+        return False
+
+    # Establezco pausa
+    time.sleep(5)
+
+    return True
+
+print("Login resultado: " + str(agregar_productos("standard_user","secret_sauce")))
 
