@@ -3,6 +3,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.options import Options
 
 import time
@@ -89,9 +90,22 @@ def comprobar_elementos_inventario(user,pwd):
     ### Comprobar presencia de menu, filtros
     try:
         driver.find_element(By.CLASS_NAME,"bm-menu")
+        ddlSort = Select(driver.find_element(By.CLASS_NAME,"product_sort_container"))
+        ddlSort.select_by_value("za")
+
+        time.sleep(4)
+
+        ddlSort = Select(driver.find_element(By.CLASS_NAME,"product_sort_container"))
+        ddlSort.select_by_value("lohi")
+
+        time.sleep(3)
         return True
     except:
         return False
+
+    
+
+
 
     return True
 
@@ -151,5 +165,5 @@ def agregar_productos(user,pwd):
 
     return True
 
-print("Login resultado: " + str(agregar_productos("standard_user","secret_sauce")))
+print("comprobar_elementos_inventario resultado: " + str(comprobar_elementos_inventario("standard_user","secret_sauce")))
 
